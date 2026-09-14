@@ -244,8 +244,11 @@
     font-size:0.85rem; color:var(--ink-soft);
   }
 
-  /* ---------- Etiqueta "Recomendados" ---------- */
-  .featured-row{ margin-bottom:0.9rem; }
+  /* ---------- Etiqueta "Recomendados" + "Filtrar por descriptores" ---------- */
+  .featured-row{
+    margin-bottom:0.9rem;
+    display:flex; flex-wrap:wrap; align-items:center; gap:0.6rem;
+  }
   .chip-featured{
     font-family:inherit; font-size:0.8rem; font-weight:600;
     padding:0.45rem 0.95rem; border-radius:999px;
@@ -259,6 +262,21 @@
     background:#E9AE12; border-color:#E9AE12; color:#fff;
   }
   .chip-featured svg{ width:14px; height:14px; }
+
+  /* Mismo tamaño/peso que chip-featured, pero en azul para distinguirlo */
+  .chip-tags-featured{
+    font-family:inherit; font-size:0.8rem; font-weight:600;
+    padding:0.45rem 0.95rem; border-radius:999px;
+    background:#E7F1FB; border:1px solid #A9CDEC;
+    color:#215A8C; cursor:pointer;
+    display:inline-flex; align-items:center; gap:0.35rem;
+    transition:all .12s ease;
+  }
+  .chip-tags-featured:hover{ border-color:#6FA8DC; }
+  .chip-tags-featured.active{
+    background:#2B7FD1; border-color:#2B7FD1; color:#fff;
+  }
+  .chip-tags-featured svg{ width:14px; height:14px; }
 
   /* ---------- Estrella de recomendado sobre la portada ---------- */
   .star-badge{
@@ -287,6 +305,10 @@
     <button class="chip-featured" id="chipRecomendados">
       <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.9 6.26L21.5 9l-5 4.87L17.8 21 12 17.27 6.2 21l1.3-7.13-5-4.87 6.6-.74z"/></svg>
       Recomendados
+    </button>
+    <button class="chip-tags-featured" id="chipFiltrarDescriptores">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+      <span id="chipFiltrarDescriptoresLabel">Filtrar por descriptores</span>
     </button>
   </div>
 
@@ -335,7 +357,7 @@
 const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSHuwSgfsqvtnOud-1NRgQ7Qg-ngpYvlYHbD6L0WZmsGyfqE6lIkYAlHDAooR9NA9dSwQI1w_G3TWrU/pub?gid=0&single=true&output=csv";
 
 // Texto libre del pie de página.
-const FOOTER_TEXT = "Solicitar en Centro de Documentación y Atención al Usuario - cdocumentacion@estadisticaciudad.gob.ar";
+const FOOTER_TEXT = "Biblioteca Viajera · catálogo de libros de la colección";
 
 /* ========================================================= */
 
@@ -352,6 +374,8 @@ const el = {
   prevBtn: document.getElementById('prevBtn'),
   nextBtn: document.getElementById('nextBtn'),
   chipRecomendados: document.getElementById('chipRecomendados'),
+  chipFiltrarDescriptores: document.getElementById('chipFiltrarDescriptores'),
+  chipFiltrarDescriptoresLabel: document.getElementById('chipFiltrarDescriptoresLabel'),
   footerText: document.getElementById('footerText'),
   tagsOverlay: document.getElementById('tagsOverlay'),
   tagsModalSearch: document.getElementById('tagsModalSearch'),
@@ -509,15 +533,10 @@ function renderChips(){
     el.chips.appendChild(btn);
   });
 
-  // Botón para abrir el modal con la lista completa de descriptores
-  const abrirBtn = document.createElement('button');
-  abrirBtn.className = 'chip chip-more';
-  abrirBtn.innerHTML = `
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
-    ${CHIPS_ACTIVOS.size ? 'Editar descriptores' : 'Filtrar por descriptores'}
-  `;
-  abrirBtn.addEventListener('click', abrirModalTags);
-  el.chips.appendChild(abrirBtn);
+  // El botón "Filtrar por descriptores" es fijo (vive junto a "Recomendados");
+  // acá solo actualizamos su etiqueta y si se ve activo.
+  el.chipFiltrarDescriptoresLabel.textContent = CHIPS_ACTIVOS.size ? 'Editar descriptores' : 'Filtrar por descriptores';
+  el.chipFiltrarDescriptores.classList.toggle('active', CHIPS_ACTIVOS.size > 0);
 }
 
 function abrirModalTags(){
@@ -660,6 +679,8 @@ el.chipRecomendados.addEventListener('click', () => {
   aplicarFiltro(el.search.value);
 });
 
+el.chipFiltrarDescriptores.addEventListener('click', abrirModalTags);
+
 el.footerText.textContent = FOOTER_TEXT;
 
 el.tagsModalClose.addEventListener('click', cerrarModalTags);
@@ -679,6 +700,10 @@ cargarDatos();
 </body>
 </html>
 
+ 
+ 
+
+ 
  
  
 
